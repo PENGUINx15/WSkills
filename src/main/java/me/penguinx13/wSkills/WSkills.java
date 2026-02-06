@@ -1,5 +1,7 @@
 package me.penguinx13.wSkills;
 
+import me.penguinx13.wSkills.command.LevelCommand;
+import me.penguinx13.wSkills.listener.AgilityXpListener;
 import me.penguinx13.wSkills.listener.DamageListener;
 import me.penguinx13.wSkills.listener.JoinQuitListener;
 import me.penguinx13.wSkills.service.SkillApplier;
@@ -25,6 +27,7 @@ public class WSkills extends JavaPlugin {
         registerSkills();
 
         registerListeners();
+        registerCommands();
 
         getLogger().info("WSkills enabled");
     }
@@ -56,6 +59,20 @@ public class WSkills extends JavaPlugin {
                 new DamageListener(),
                 this
         );
+
+        pm.registerEvents(
+                new AgilityXpListener(skillManager, skillApplier, skillStorage),
+                this
+        );
+    }
+
+    private void registerCommands() {
+        LevelCommand levelCommand = new LevelCommand(skillManager, skillApplier, skillStorage);
+        var command = getCommand("wskills");
+        if (command != null) {
+            command.setExecutor(levelCommand);
+            command.setTabCompleter(levelCommand);
+        }
     }
 
     /* ============================ */

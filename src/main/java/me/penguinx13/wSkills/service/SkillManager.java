@@ -56,7 +56,54 @@ public class SkillManager {
         playerSkills.get(player.getUniqueId()).setLevel(type, level);
     }
 
+    public int getXp(Player player, SkillType type) {
+        PlayerSkills ps = playerSkills.get(player.getUniqueId());
+        return ps == null ? 0 : ps.getXp(type);
+    }
+
+    public void setXp(Player player, SkillType type, int xp) {
+        playerSkills.get(player.getUniqueId()).setXp(type, xp);
+    }
+
+    public int addXp(Player player, SkillType type, int amount) {
+        if (amount <= 0) {
+            return getLevel(player, type);
+        }
+
+        registerPlayer(player);
+
+        Skill skill = registeredSkills.get(type);
+        if (skill == null) {
+            return getLevel(player, type);
+        }
+
+        PlayerSkills ps = playerSkills.get(player.getUniqueId());
+        int level = ps.getLevel(type);
+        int xp = ps.getXp(type) + amount;
+        while (level < skill.getMaxLevel()) {
+            int requiredXp = getRequiredXp(level);
+            if (xp < requiredXp) {
+                break;
+            }
+            xp -= requiredXp;
+            level += 1;
+        }
+
+        if (level >= skill.getMaxLevel()) {
+            xp = 0;
+        }
+
+        ps.setLevel(type, level);
+        ps.setXp(type, xp);
+
+        return level;
+    }
+
     public PlayerSkills getPlayerSkills(Player player) {
         return playerSkills.get(player.getUniqueId());
+    }
+
+    private int getRequiredXp(int level) {
+        return 5000 * (level + 1);
     }
 }
