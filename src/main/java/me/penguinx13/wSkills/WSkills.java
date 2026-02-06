@@ -9,8 +9,6 @@ import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
 import me.penguinx13.wSkills.skills.agility.AgilitySkill;
-import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class WSkills extends JavaPlugin {
@@ -74,10 +72,11 @@ public class WSkills extends JavaPlugin {
 
     private void registerCommands() {
         LevelCommand levelCommand = new LevelCommand(skillManager, skillApplier, skillStorage);
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            Commands commands = event.registrar();
-            commands.register("wskills", levelCommand.createCommand(), "skills");
-        });
+        var command = getCommand("wskills");
+        if (command != null) {
+            command.setExecutor(levelCommand);
+            command.setTabCompleter(levelCommand);
+        }
     }
 
     /* ============================ */
