@@ -14,14 +14,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class SkillMenu {
 
-    public static final String TITLE = NamedTextColor.DARK_GREEN + "Навыки";
+    public static final Component TITLE = Component.text("Навыки", NamedTextColor.DARK_GREEN);
 
     private static final int SKILL_SECTION_SIZE = 18;
     private static final int INVENTORY_SIZE = 54;
@@ -65,7 +64,7 @@ public class SkillMenu {
                 if (slot >= INVENTORY_SIZE) {
                     break;
                 }
-                inventory.setItem(slot+1, createLevelItem(i, level, xp));
+                inventory.setItem(slot, createLevelItem(i, level, xp));
             }
         }
 
@@ -75,12 +74,17 @@ public class SkillMenu {
     private ItemStack createHeader(SkillType type, Skill skill, int level, int xp) {
         ItemStack item = new ItemStack(Material.BOOK);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text(NamedTextColor.GOLD + getDisplayName(type)).style(Style.style(TextDecoration.BOLD)));
+        meta.displayName(Component.text(getDisplayName(type), NamedTextColor.GOLD)
+                .style(Style.style(TextDecoration.BOLD)));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text(NamedTextColor.WHITE + "Уровень: " + NamedTextColor.GOLD + level));
-        lore.add(Component.text(NamedTextColor.WHITE + "Опыт: " + NamedTextColor.GOLD + xp));
-        lore.add(Component.text(NamedTextColor.WHITE + "Бонус скорости: " + NamedTextColor.GOLD + formatPercent(getSpeedBonus(type, skill, level))));
-        lore.add(Component.text(NamedTextColor.WHITE + "Бонус уклонения: " + NamedTextColor.GOLD + formatPercent(getDodgeBonus(type, level))));
+        lore.add(Component.text("Уровень: ", NamedTextColor.WHITE)
+                .append(Component.text(level, NamedTextColor.GOLD)));
+        lore.add(Component.text("Опыт: ", NamedTextColor.WHITE)
+                .append(Component.text(xp, NamedTextColor.GOLD)));
+        lore.add(Component.text("Бонус скорости: ", NamedTextColor.WHITE)
+                .append(Component.text(formatPercent(getSpeedBonus(type, skill, level)), NamedTextColor.GOLD)));
+        lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
+                .append(Component.text(formatPercent(getDodgeBonus(type, level)), NamedTextColor.GOLD)));
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
@@ -90,9 +94,13 @@ public class SkillMenu {
         Material material = getLevelMaterial(levelNumber, currentLevel);
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text(NamedTextColor.YELLOW + "Уровень " + levelNumber));
+        meta.displayName(Component.text("Уровень " + levelNumber, NamedTextColor.YELLOW));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text(NamedTextColor.WHITE + "Опыт: "+ NamedTextColor.YELLOW + xp + NamedTextColor.WHITE + NamedTextColor.GOLD + (5000 * levelNumber)));
+        int requiredXp = 5000 * levelNumber;
+        lore.add(Component.text("Опыт: ", NamedTextColor.WHITE)
+                .append(Component.text(xp, NamedTextColor.YELLOW))
+                .append(Component.text("/", NamedTextColor.WHITE))
+                .append(Component.text(requiredXp, NamedTextColor.GOLD)));
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
