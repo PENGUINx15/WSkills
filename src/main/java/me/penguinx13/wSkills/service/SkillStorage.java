@@ -4,6 +4,7 @@ import me.penguinx13.wSkills.API.SkillType;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -83,7 +84,6 @@ public class SkillStorage {
                         levels.put(type, level);
                         manager.setXp(player, type, xp);
                     } catch (IllegalArgumentException ignored) {
-                        // Ignore unknown skill names
                     }
                 }
             }

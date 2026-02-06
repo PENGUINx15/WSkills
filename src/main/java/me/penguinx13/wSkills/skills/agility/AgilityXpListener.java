@@ -1,4 +1,4 @@
-package me.penguinx13.wSkills.listener;
+package me.penguinx13.wSkills.skills.agility;
 
 import me.penguinx13.wSkills.API.SkillType;
 import me.penguinx13.wSkills.service.SkillApplier;

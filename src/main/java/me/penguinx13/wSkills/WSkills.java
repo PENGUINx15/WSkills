@@ -1,7 +1,7 @@
 package me.penguinx13.wSkills;
 
 import me.penguinx13.wSkills.command.LevelCommand;
-import me.penguinx13.wSkills.listener.AgilityXpListener;
+import me.penguinx13.wSkills.skills.agility.AgilityXpListener;
 import me.penguinx13.wSkills.listener.DamageListener;
 import me.penguinx13.wSkills.listener.JoinQuitListener;
 import me.penguinx13.wSkills.service.SkillApplier;
@@ -34,11 +34,9 @@ public class WSkills extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
         getServer().getOnlinePlayers().forEach(player ->
                 skillStorage.save(player, skillManager)
         );
-
         getLogger().info("WSkills disabled");
     }
 
