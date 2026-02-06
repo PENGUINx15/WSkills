@@ -4,6 +4,7 @@ import me.penguinx13.wSkills.API.SkillType;
 import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
+import me.penguinx13.wSkills.ui.SkillMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -25,17 +26,29 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
     private final SkillManager manager;
     private final SkillApplier applier;
     private final SkillStorage storage;
+    private final SkillMenu skillMenu;
 
     public LevelCommand(SkillManager manager, SkillApplier applier, SkillStorage storage) {
         this.manager = manager;
         this.applier = applier;
         this.storage = storage;
+        this.skillMenu = new SkillMenu(manager);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             sendUsage(sender, label);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("menu")) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage(ChatColor.RED + "Only players can open the skill menu.");
+                return true;
+            }
+            manager.registerPlayer(player);
+            skillMenu.open(player);
             return true;
         }
 
@@ -128,7 +141,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filterPrefix(Collections.singletonList("level"), args[0]);
+            return filterPrefix(Arrays.asList("level", "menu"), args[0]);
         }
         if (!args[0].equalsIgnoreCase("level")) {
             return Collections.emptyList();
@@ -155,6 +168,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
 
     private void sendUsage(CommandSender sender, String label) {
         sender.sendMessage(ChatColor.YELLOW + "Usage:");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " menu");
         sender.sendMessage(ChatColor.YELLOW + "/" + label + " level get <player> <skill>");
         sender.sendMessage(ChatColor.YELLOW + "/" + label + " level set <player> <skill> <level>");
         sender.sendMessage(ChatColor.YELLOW + "/" + label + " level add <player> <skill> <amount>");
