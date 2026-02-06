@@ -1,6 +1,8 @@
 package me.penguinx13.wSkills.service;
 
-import ru.yourplugin.skills.api.*;
+import me.penguinx13.wSkills.API.PlayerSkills;
+import me.penguinx13.wSkills.API.Skill;
+import me.penguinx13.wSkills.API.SkillType;
 import org.bukkit.entity.Player;
 
 import java.util.*;

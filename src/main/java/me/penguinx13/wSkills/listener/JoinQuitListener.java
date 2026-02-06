@@ -1,6 +1,8 @@
 package me.penguinx13.wSkills.listener;
 
-import ru.yourplugin.skills.service.*;
+import me.penguinx13.wSkills.service.SkillApplier;
+import me.penguinx13.wSkills.service.SkillManager;
+import me.penguinx13.wSkills.service.SkillStorage;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
