@@ -5,23 +5,21 @@ import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
 import me.penguinx13.wSkills.ui.SkillMenu;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
-public class LevelCommand implements CommandExecutor, TabCompleter {
+import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
 
-    private static final List<String> SUBCOMMANDS = Arrays.asList("get", "set", "add");
+public class LevelCommand {
 
     private final SkillManager manager;
     private final SkillApplier applier;
@@ -35,135 +33,125 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         this.skillMenu = new SkillMenu(manager);
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 0) {
-            sendUsage(sender, label);
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("menu")) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage(ChatColor.RED + "Only players can open the skill menu.");
-                return true;
-            }
-            manager.registerPlayer(player);
-            skillMenu.open(player);
-            return true;
-        }
-
-        if (!args[0].equalsIgnoreCase("level")) {
-            sendUsage(sender, label);
-            return true;
-        }
-
-        if (args.length < 2) {
-            sendUsage(sender, label);
-            return true;
-        }
-
-        String action = args[1].toLowerCase(Locale.ROOT);
-        if (!SUBCOMMANDS.contains(action)) {
-            sendUsage(sender, label);
-            return true;
-        }
-
-        if (args.length < 4) {
-            sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level " + action + " <player> <skill> [value]");
-            return true;
-        }
-
-        Player target = Bukkit.getPlayerExact(args[2]);
-        if (target == null) {
-            sender.sendMessage(ChatColor.RED + "Player not found or not online.");
-            return true;
-        }
-
-        SkillType type = parseSkillType(args[3]);
-        if (type == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown skill type.");
-            return true;
-        }
-
-        manager.registerPlayer(target);
-
-        switch (action) {
-            case "get" -> {
-                int level = manager.getLevel(target, type);
-                sender.sendMessage(ChatColor.GREEN + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
-                        + " level: " + level);
-            }
-            case "set" -> {
-                if (args.length < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level set <player> <skill> <level>");
-                    return true;
-                }
-                Integer level = parseLevel(args[4], sender);
-                if (level == null) {
-                    return true;
-                }
-                if (level < 0) {
-                    sender.sendMessage(ChatColor.RED + "Level cannot be negative.");
-                    return true;
-                }
-                manager.setLevel(target, type, level);
-                applier.applySkill(target, type);
-                storage.save(target, manager);
-                sender.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
-                        + " level to " + level + ".");
-            }
-            case "add" -> {
-                if (args.length < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level add <player> <skill> <amount>");
-                    return true;
-                }
-                Integer amount = parseLevel(args[4], sender);
-                if (amount == null) {
-                    return true;
-                }
-                int current = manager.getLevel(target, type);
-                int updated = current + amount;
-                if (updated < 0) {
-                    updated = 0;
-                }
-                manager.setLevel(target, type, updated);
-                applier.applySkill(target, type);
-                storage.save(target, manager);
-                sender.sendMessage(ChatColor.GREEN + "Updated " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
-                        + " level to " + updated + ".");
-            }
-            default -> sendUsage(sender, label);
-        }
-
-        return true;
+    public LiteralArgumentBuilder<CommandSourceStack> createCommand() {
+        return literal("wskills")
+                .executes(context -> {
+                    sendUsage(context.getSource().getSender(), "wskills");
+                    return 1;
+                })
+                .then(literal("menu")
+                        .executes(context -> {
+                            openMenu(context.getSource().getSender());
+                            return 1;
+                        }))
+                .then(literal("level")
+                        .executes(context -> {
+                            sendUsage(context.getSource().getSender(), "wskills");
+                            return 1;
+                        })
+                        .then(literal("get")
+                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("player", StringArgumentType.word())
+                                        .suggests(PLAYER_SUGGESTIONS)
+                                        .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("skill", StringArgumentType.word())
+                                                .suggests(SKILL_SUGGESTIONS)
+                                                .executes(context -> {
+                                                    CommandSender sender = context.getSource().getSender();
+                                                    String playerName = StringArgumentType.getString(context, "player");
+                                                    String skillName = StringArgumentType.getString(context, "skill");
+                                                    handleGet(sender, playerName, skillName);
+                                                    return 1;
+                                                }))))
+                        .then(literal("set")
+                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("player", StringArgumentType.word())
+                                        .suggests(PLAYER_SUGGESTIONS)
+                                        .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("skill", StringArgumentType.word())
+                                                .suggests(SKILL_SUGGESTIONS)
+                                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, Integer>argument("level", IntegerArgumentType.integer(0))
+                                                        .executes(context -> {
+                                                            CommandSender sender = context.getSource().getSender();
+                                                            String playerName = StringArgumentType.getString(context, "player");
+                                                            String skillName = StringArgumentType.getString(context, "skill");
+                                                            int level = IntegerArgumentType.getInteger(context, "level");
+                                                            handleSet(sender, playerName, skillName, level);
+                                                            return 1;
+                                                        })))))
+                        .then(literal("add")
+                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("player", StringArgumentType.word())
+                                        .suggests(PLAYER_SUGGESTIONS)
+                                        .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, String>argument("skill", StringArgumentType.word())
+                                                .suggests(SKILL_SUGGESTIONS)
+                                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<CommandSourceStack, Integer>argument("amount", IntegerArgumentType.integer())
+                                                        .executes(context -> {
+                                                            CommandSender sender = context.getSource().getSender();
+                                                            String playerName = StringArgumentType.getString(context, "player");
+                                                            String skillName = StringArgumentType.getString(context, "skill");
+                                                            int amount = IntegerArgumentType.getInteger(context, "amount");
+                                                            handleAdd(sender, playerName, skillName, amount);
+                                                            return 1;
+                                                        })))))));
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1) {
-            return filterPrefix(Arrays.asList("level", "menu"), args[0]);
+    private void openMenu(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can open the skill menu.");
+            return;
         }
-        if (!args[0].equalsIgnoreCase("level")) {
-            return Collections.emptyList();
+        manager.registerPlayer(player);
+        skillMenu.open(player);
+    }
+
+    private void handleGet(CommandSender sender, String playerName, String skillName) {
+        Player target = findPlayer(sender, playerName);
+        if (target == null) {
+            return;
         }
-        if (args.length == 2) {
-            return filterPrefix(SUBCOMMANDS, args[1]);
+        SkillType type = parseSkillType(sender, skillName);
+        if (type == null) {
+            return;
         }
-        if (args.length == 3) {
-            List<String> players = new ArrayList<>();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                players.add(player.getName());
-            }
-            return filterPrefix(players, args[2]);
+        manager.registerPlayer(target);
+        int level = manager.getLevel(target, type);
+        sender.sendMessage(ChatColor.GREEN + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                + " level: " + level);
+    }
+
+    private void handleSet(CommandSender sender, String playerName, String skillName, int level) {
+        Player target = findPlayer(sender, playerName);
+        if (target == null) {
+            return;
         }
-        if (args.length == 4) {
-            List<String> skills = new ArrayList<>();
-            for (SkillType type : SkillType.values()) {
-                skills.add(type.name().toLowerCase(Locale.ROOT));
-            }
-            return filterPrefix(skills, args[3]);
+        SkillType type = parseSkillType(sender, skillName);
+        if (type == null) {
+            return;
         }
-        return Collections.emptyList();
+        manager.registerPlayer(target);
+        manager.setLevel(target, type, level);
+        applier.applySkill(target, type);
+        storage.save(target, manager);
+        sender.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                + " level to " + level + ".");
+    }
+
+    private void handleAdd(CommandSender sender, String playerName, String skillName, int amount) {
+        Player target = findPlayer(sender, playerName);
+        if (target == null) {
+            return;
+        }
+        SkillType type = parseSkillType(sender, skillName);
+        if (type == null) {
+            return;
+        }
+        manager.registerPlayer(target);
+        int current = manager.getLevel(target, type);
+        int updated = current + amount;
+        if (updated < 0) {
+            updated = 0;
+        }
+        manager.setLevel(target, type, updated);
+        applier.applySkill(target, type);
+        storage.save(target, manager);
+        sender.sendMessage(ChatColor.GREEN + "Updated " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                + " level to " + updated + ".");
     }
 
     private void sendUsage(CommandSender sender, String label) {
@@ -182,26 +170,34 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    private Integer parseLevel(String input, CommandSender sender) {
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            sender.sendMessage(ChatColor.RED + "Level must be a number.");
-            return null;
+    private SkillType parseSkillType(CommandSender sender, String input) {
+        SkillType type = parseSkillType(input);
+        if (type == null) {
+            sender.sendMessage(ChatColor.RED + "Unknown skill type.");
         }
+        return type;
     }
 
-    private List<String> filterPrefix(List<String> options, String prefix) {
-        if (prefix == null || prefix.isEmpty()) {
-            return options;
+    private Player findPlayer(CommandSender sender, String name) {
+        Player target = Bukkit.getPlayerExact(name);
+        if (target == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found or not online.");
+            return null;
         }
-        String lower = prefix.toLowerCase(Locale.ROOT);
-        List<String> matches = new ArrayList<>();
-        for (String option : options) {
-            if (option.toLowerCase(Locale.ROOT).startsWith(lower)) {
-                matches.add(option);
-            }
-        }
-        return matches;
+        return target;
     }
+
+    private static final SuggestionProvider<CommandSourceStack> PLAYER_SUGGESTIONS = (context, builder) -> {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            builder.suggest(player.getName());
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<CommandSourceStack> SKILL_SUGGESTIONS = (context, builder) -> {
+        for (SkillType type : SkillType.values()) {
+            builder.suggest(type.name().toLowerCase(Locale.ROOT));
+        }
+        return builder.buildFuture();
+    };
 }
