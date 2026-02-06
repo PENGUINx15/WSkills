@@ -5,13 +5,14 @@ import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
 import me.penguinx13.wSkills.ui.SkillMenu;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             sendUsage(sender, label);
             return true;
@@ -44,7 +45,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("menu")) {
             if (!(sender instanceof Player player)) {
-                sender.sendMessage(ChatColor.RED + "Only players can open the skill menu.");
+                sender.sendMessage(NamedTextColor.RED + "Only players can open the skill menu.");
                 return true;
             }
             manager.registerPlayer(player);
@@ -69,19 +70,19 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 4) {
-            sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level " + action + " <player> <skill> [value]");
+            sender.sendMessage(NamedTextColor.RED + "Usage: /" + label + " level " + action + " <player> <skill> [value]");
             return true;
         }
 
         Player target = Bukkit.getPlayerExact(args[2]);
         if (target == null) {
-            sender.sendMessage(ChatColor.RED + "Player not found or not online.");
+            sender.sendMessage(NamedTextColor.RED + "Player not found or not online.");
             return true;
         }
 
         SkillType type = parseSkillType(args[3]);
         if (type == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown skill type.");
+            sender.sendMessage(NamedTextColor.RED + "Unknown skill type.");
             return true;
         }
 
@@ -90,12 +91,12 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         switch (action) {
             case "get" -> {
                 int level = manager.getLevel(target, type);
-                sender.sendMessage(ChatColor.GREEN + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                sender.sendMessage(NamedTextColor.GREEN + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
                         + " level: " + level);
             }
             case "set" -> {
                 if (args.length < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level set <player> <skill> <level>");
+                    sender.sendMessage(NamedTextColor.RED + "Usage: /" + label + " level set <player> <skill> <level>");
                     return true;
                 }
                 Integer level = parseLevel(args[4], sender);
@@ -103,18 +104,18 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (level < 0) {
-                    sender.sendMessage(ChatColor.RED + "Level cannot be negative.");
+                    sender.sendMessage(NamedTextColor.RED + "Level cannot be negative.");
                     return true;
                 }
                 manager.setLevel(target, type, level);
                 applier.applySkill(target, type);
                 storage.save(target, manager);
-                sender.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                sender.sendMessage(NamedTextColor.GREEN + "Set " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
                         + " level to " + level + ".");
             }
             case "add" -> {
                 if (args.length < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + label + " level add <player> <skill> <amount>");
+                    sender.sendMessage(NamedTextColor.RED + "Usage: /" + label + " level add <player> <skill> <amount>");
                     return true;
                 }
                 Integer amount = parseLevel(args[4], sender);
@@ -129,7 +130,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
                 manager.setLevel(target, type, updated);
                 applier.applySkill(target, type);
                 storage.save(target, manager);
-                sender.sendMessage(ChatColor.GREEN + "Updated " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
+                sender.sendMessage(NamedTextColor.GREEN + "Updated " + target.getName() + " " + type.name().toLowerCase(Locale.ROOT)
                         + " level to " + updated + ".");
             }
             default -> sendUsage(sender, label);
@@ -139,7 +140,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (args.length == 1) {
             return filterPrefix(Arrays.asList("level", "menu"), args[0]);
         }
@@ -167,11 +168,11 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendUsage(CommandSender sender, String label) {
-        sender.sendMessage(ChatColor.YELLOW + "Usage:");
-        sender.sendMessage(ChatColor.YELLOW + "/" + label + " menu");
-        sender.sendMessage(ChatColor.YELLOW + "/" + label + " level get <player> <skill>");
-        sender.sendMessage(ChatColor.YELLOW + "/" + label + " level set <player> <skill> <level>");
-        sender.sendMessage(ChatColor.YELLOW + "/" + label + " level add <player> <skill> <amount>");
+        sender.sendMessage(NamedTextColor.YELLOW + "Usage:");
+        sender.sendMessage(NamedTextColor.YELLOW + "/" + label + " menu");
+        sender.sendMessage(NamedTextColor.YELLOW + "/" + label + " level get <player> <skill>");
+        sender.sendMessage(NamedTextColor.YELLOW + "/" + label + " level set <player> <skill> <level>");
+        sender.sendMessage(NamedTextColor.YELLOW + "/" + label + " level add <player> <skill> <amount>");
     }
 
     private SkillType parseSkillType(String input) {
@@ -186,7 +187,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            sender.sendMessage(ChatColor.RED + "Level must be a number.");
+            sender.sendMessage(NamedTextColor.RED + "Level must be a number.");
             return null;
         }
     }

@@ -79,8 +79,6 @@ public class WSkills extends JavaPlugin {
         }
     }
 
-    /* ============================ */
-
     public SkillManager getSkillManager() {
         return skillManager;
     }
