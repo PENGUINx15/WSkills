@@ -3,23 +3,26 @@ package me.penguinx13.wSkills.ui;
 import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillType;
 import me.penguinx13.wSkills.service.SkillManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class SkillMenu {
 
-    public static final String TITLE = ChatColor.DARK_GREEN + "Навыки";
+    public static final String TITLE = NamedTextColor.DARK_GREEN + "Навыки";
 
-    private static final int LEVELS_PER_SKILL = 10;
     private static final int SKILL_SECTION_SIZE = 18;
     private static final int INVENTORY_SIZE = 54;
 
@@ -56,12 +59,13 @@ public class SkillMenu {
 
             inventory.setItem(base, createHeader(type, skill, level, xp));
 
-            for (int i = 1; i <= LEVELS_PER_SKILL; i++) {
+            int maxLevel = skill.getMaxLevel();
+            for (int i = 1; i <= maxLevel; i++) {
                 int slot = base + i;
                 if (slot >= INVENTORY_SIZE) {
                     break;
                 }
-                inventory.setItem(slot, createLevelItem(skill, i, level));
+                inventory.setItem(slot+1, createLevelItem(i, level, xp));
             }
         }
 
@@ -71,26 +75,25 @@ public class SkillMenu {
     private ItemStack createHeader(SkillType type, Skill skill, int level, int xp) {
         ItemStack item = new ItemStack(Material.BOOK);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + getDisplayName(type));
-        List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Уровень: " + ChatColor.GREEN + level + ChatColor.GRAY + "/" + skill.getMaxLevel());
-        lore.add(ChatColor.GRAY + "Опыт: " + ChatColor.AQUA + xp);
-        lore.add(ChatColor.GRAY + "Бонус за уровень: " + ChatColor.GREEN + formatPercent(skill.getValuePerLevel()));
-        meta.setLore(lore);
+        meta.displayName(Component.text(NamedTextColor.GOLD + getDisplayName(type)).style(Style.style(TextDecoration.BOLD)));
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.text(NamedTextColor.WHITE + "Уровень: " + NamedTextColor.GOLD + level));
+        lore.add(Component.text(NamedTextColor.WHITE + "Опыт: " + NamedTextColor.GOLD + xp));
+        lore.add(Component.text(NamedTextColor.WHITE + "Бонус скорости: " + NamedTextColor.GOLD + formatPercent(getSpeedBonus(type, skill, level))));
+        lore.add(Component.text(NamedTextColor.WHITE + "Бонус уклонения: " + NamedTextColor.GOLD + formatPercent(getDodgeBonus(type, level))));
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
 
-    private ItemStack createLevelItem(Skill skill, int levelNumber, int currentLevel) {
+    private ItemStack createLevelItem(int levelNumber, int currentLevel, int xp) {
         Material material = getLevelMaterial(levelNumber, currentLevel);
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.YELLOW + "Уровень " + levelNumber);
-        List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Бонус уровня: " + ChatColor.GREEN + formatPercent(skill.getValuePerLevel()));
-        lore.add(ChatColor.GRAY + "Суммарно: " + ChatColor.GREEN + formatPercent(skill.getValuePerLevel() * levelNumber));
-        lore.add(ChatColor.GRAY + "Требуется опыта: " + ChatColor.AQUA + (5000 * levelNumber));
-        meta.setLore(lore);
+        meta.displayName(Component.text(NamedTextColor.YELLOW + "Уровень " + levelNumber));
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.text(NamedTextColor.WHITE + "Опыт: "+ NamedTextColor.YELLOW + xp + NamedTextColor.WHITE + NamedTextColor.GOLD + (5000 * levelNumber)));
+        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }
@@ -114,6 +117,20 @@ public class SkillMenu {
             return String.format("%.0f%%", percent);
         }
         return String.format("%.1f%%", percent);
+    }
+
+    private double getSpeedBonus(SkillType type, Skill skill, int level) {
+        if (type == SkillType.AGILITY) {
+            return skill.getValuePerLevel() * level;
+        }
+        return 0.0;
+    }
+
+    private double getDodgeBonus(SkillType type, int level) {
+        if (type == SkillType.AGILITY) {
+            return Math.min(0.25, level * 0.025);
+        }
+        return 0.0;
     }
 
     private String getDisplayName(SkillType type) {

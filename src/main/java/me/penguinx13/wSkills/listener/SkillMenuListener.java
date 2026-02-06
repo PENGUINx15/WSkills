@@ -10,14 +10,14 @@ public class SkillMenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView().getTitle().equals(SkillMenu.TITLE)) {
+        if (event.getView().title().equals(SkillMenu.TITLE)) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (event.getView().getTitle().equals(SkillMenu.TITLE)) {
+        if (event.getView().title().equals(SkillMenu.TITLE)) {
             event.setCancelled(true);
         }
     }

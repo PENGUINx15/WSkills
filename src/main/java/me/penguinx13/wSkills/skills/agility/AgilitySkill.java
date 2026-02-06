@@ -20,12 +20,12 @@ public class AgilitySkill implements Skill {
 
     @Override
     public int getMaxLevel() {
-        return 10;
+        return 5;
     }
 
     @Override
     public double getValuePerLevel() {
-        return 0.05; // 5%
+        return 0.1;
     }
 
     @Override

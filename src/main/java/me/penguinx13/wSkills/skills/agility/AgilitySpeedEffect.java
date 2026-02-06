@@ -13,8 +13,8 @@ public class AgilitySpeedEffect implements SkillEffect {
         var attr = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
         if (attr == null) return;
 
-        int cappedLevel = Math.min(level, 10);
-        double multiplier = 1.0 + (cappedLevel / 10.0) * 0.5;
+        int cappedLevel = Math.min(level, 5);
+        double multiplier = 1.0 + (cappedLevel / 5.0) * 0.5;
         attr.setBaseValue(BASE_SPEED * multiplier);
     }
 }
