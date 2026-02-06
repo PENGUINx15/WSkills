@@ -19,8 +19,6 @@ public class WSkills extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-
         this.skillManager = new SkillManager();
         this.skillApplier = new SkillApplier(skillManager);
         this.skillStorage = new SkillStorage(getDataFolder());
