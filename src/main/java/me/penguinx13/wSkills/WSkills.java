@@ -4,6 +4,7 @@ import me.penguinx13.wSkills.command.LevelCommand;
 import me.penguinx13.wSkills.skills.agility.AgilityXpListener;
 import me.penguinx13.wSkills.listener.DamageListener;
 import me.penguinx13.wSkills.listener.JoinQuitListener;
+import me.penguinx13.wSkills.listener.SkillMenuListener;
 import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
@@ -60,6 +61,11 @@ public class WSkills extends JavaPlugin {
 
         pm.registerEvents(
                 new AgilityXpListener(skillManager, skillApplier, skillStorage),
+                this
+        );
+
+        pm.registerEvents(
+                new SkillMenuListener(),
                 this
         );
     }
