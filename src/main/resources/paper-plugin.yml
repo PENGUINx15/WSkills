@@ -2,8 +2,3 @@ name: WSkills
 version: '1.0.0'
 main: me.penguinx13.wSkills.WSkills
 api-version: '1.20'
-commands:
-  wskills:
-    description: Manage player skill levels.
-    usage: /wskills menu | /wskills level <get|set|add> <player> <skill> [value]
-    aliases: [skills]
