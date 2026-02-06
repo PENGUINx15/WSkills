@@ -34,11 +34,33 @@ public class SkillStorage {
                             "player_uuid TEXT NOT NULL," +
                             "skill TEXT NOT NULL," +
                             "level INTEGER NOT NULL," +
+                            "xp INTEGER NOT NULL DEFAULT 0," +
                             "PRIMARY KEY (player_uuid, skill)" +
                             ")"
             );
+            ensureXpColumn(connection);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void ensureXpColumn(Connection connection) throws SQLException {
+        boolean hasXpColumn = false;
+        try (PreparedStatement statement = connection.prepareStatement("PRAGMA table_info(player_skills)");
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                if ("xp".equalsIgnoreCase(name)) {
+                    hasXpColumn = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasXpColumn) {
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("ALTER TABLE player_skills ADD COLUMN xp INTEGER NOT NULL DEFAULT 0");
+            }
         }
     }
 
@@ -46,7 +68,7 @@ public class SkillStorage {
         manager.registerPlayer(player);
 
         Map<SkillType, Integer> levels = new EnumMap<>(SkillType.class);
-        String sql = "SELECT skill, level FROM player_skills WHERE player_uuid = ?";
+        String sql = "SELECT skill, level, xp FROM player_skills WHERE player_uuid = ?";
 
         try (Connection connection = DriverManager.getConnection(databaseUrl);
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -55,9 +77,11 @@ public class SkillStorage {
                 while (resultSet.next()) {
                     String skillName = resultSet.getString("skill");
                     int level = resultSet.getInt("level");
+                    int xp = resultSet.getInt("xp");
                     try {
                         SkillType type = SkillType.valueOf(skillName);
                         levels.put(type, level);
+                        manager.setXp(player, type, xp);
                     } catch (IllegalArgumentException ignored) {
                         // Ignore unknown skill names
                     }
@@ -74,8 +98,8 @@ public class SkillStorage {
     }
 
     public void save(Player player, SkillManager manager) {
-        String sql = "INSERT INTO player_skills (player_uuid, skill, level) VALUES (?, ?, ?) " +
-                "ON CONFLICT(player_uuid, skill) DO UPDATE SET level = excluded.level";
+        String sql = "INSERT INTO player_skills (player_uuid, skill, level, xp) VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT(player_uuid, skill) DO UPDATE SET level = excluded.level, xp = excluded.xp";
 
         try (Connection connection = DriverManager.getConnection(databaseUrl);
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -83,6 +107,7 @@ public class SkillStorage {
                 statement.setString(1, player.getUniqueId().toString());
                 statement.setString(2, type.name());
                 statement.setInt(3, manager.getLevel(player, type));
+                statement.setInt(4, manager.getXp(player, type));
                 statement.addBatch();
             }
             statement.executeBatch();

@@ -17,7 +17,7 @@ public class AgilityDodgeEffect implements SkillEffect, Listener {
         if (!(event.getEntity() instanceof Player player)) return;
 
         int level = SkillManager.get().getLevel(player, SkillType.AGILITY);
-        double chance = level * 0.002;
+        double chance = Math.min(0.25, level * 0.025);
 
         if (ChanceUtil.roll(chance)) {
             event.setCancelled(true);
