@@ -81,10 +81,7 @@ public class SkillMenu {
                 .append(Component.text(level, NamedTextColor.GOLD)));
         lore.add(Component.text("Опыт: ", NamedTextColor.WHITE)
                 .append(Component.text(xp, NamedTextColor.GOLD)));
-        lore.add(Component.text("Бонус скорости: ", NamedTextColor.WHITE)
-                .append(Component.text(formatPercent(getSpeedBonus(type, skill, level)), NamedTextColor.GOLD)));
-        lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
-                .append(Component.text(formatPercent(getDodgeBonus(type, level)), NamedTextColor.GOLD)));
+        lore.addAll(getBonusLore(type, skill, level));
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
@@ -127,18 +124,21 @@ public class SkillMenu {
         return String.format("%.1f%%", percent);
     }
 
-    private double getSpeedBonus(SkillType type, Skill skill, int level) {
-        if (type == SkillType.AGILITY) {
-            return skill.getValuePerLevel() * level;
+    private List<Component> getBonusLore(SkillType type, Skill skill, int level) {
+        List<Component> lore = new ArrayList<>();
+        switch (type) {
+            case AGILITY -> {
+                lore.add(Component.text("Бонус скорости: ", NamedTextColor.WHITE)
+                        .append(Component.text(formatPercent(skill.getValuePerLevel() * level), NamedTextColor.GOLD)));
+                lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
+                        .append(Component.text(formatPercent(Math.min(0.25, level * 0.025)), NamedTextColor.GOLD)));
+            }
+            case MINNING -> lore.add(Component.text("Бонус скорости добычи: ", NamedTextColor.WHITE)
+                    .append(Component.text(formatPercent(skill.getValuePerLevel() * level), NamedTextColor.GOLD)));
+            default -> {
+            }
         }
-        return 0.0;
-    }
-
-    private double getDodgeBonus(SkillType type, int level) {
-        if (type == SkillType.AGILITY) {
-            return Math.min(0.25, level * 0.025);
-        }
-        return 0.0;
+        return lore;
     }
 
     private String getDisplayName(SkillType type) {
@@ -146,6 +146,7 @@ public class SkillMenu {
             case AGILITY -> "Ловкость";
             case STRENGTH -> "Сила";
             case ENDURANCE -> "Выносливость";
+            case MINNING -> "Майнинг";
         };
     }
 }
