@@ -35,8 +35,6 @@ public class AgilityXpListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        event.getTo();
-
         Player player = event.getPlayer();
 
         boolean moved = event.getFrom().getX() != event.getTo().getX()

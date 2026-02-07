@@ -9,7 +9,7 @@ import java.util.List;
 public class MinningSkill implements Skill {
 
     private final List<SkillEffect> effects = List.of(
-            new MinningHasteEffect()
+            new MinningSkillEffect()
     );
 
     @Override

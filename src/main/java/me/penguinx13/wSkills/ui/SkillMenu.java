@@ -131,8 +131,19 @@ public class SkillMenu {
                 lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
                         .append(Component.text(formatPercent(Math.min(0.25, level * 0.025)), NamedTextColor.GOLD)));
             }
-            case MINNING -> lore.add(Component.text("Бонус скорости добычи: ", NamedTextColor.WHITE)
-                    .append(Component.text(formatPercent(skill.getValuePerLevel() * level), NamedTextColor.GOLD)));
+            case MINNING -> {
+                double doubleDropChance = 0.05 * level;
+                lore.add(Component.text("Шанс двойного дропа: ", NamedTextColor.WHITE)
+                        .append(Component.text(formatPercent(doubleDropChance), NamedTextColor.GOLD)));
+
+                double durabilityBonus = 0.10 * level;
+                lore.add(Component.text("Снижение износа инструмента: ", NamedTextColor.WHITE)
+                        .append(Component.text(formatPercent(durabilityBonus), NamedTextColor.GOLD)));
+
+                int extraXp = 2 * level;
+                lore.add(Component.text("Доп. опыт за добычу: ", NamedTextColor.WHITE)
+                        .append(Component.text(String.valueOf(extraXp), NamedTextColor.GOLD)));
+            }
             default -> {
             }
         }
