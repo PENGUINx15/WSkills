@@ -1,4 +1,4 @@
-package me.penguinx13.wSkills.skills.minning;
+package me.penguinx13.wSkills.skills.mining;
 
 import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillEffect;
@@ -6,15 +6,15 @@ import me.penguinx13.wSkills.API.SkillType;
 
 import java.util.List;
 
-public class MinningSkill implements Skill {
+public class MiningSkill implements Skill {
 
     private final List<SkillEffect> effects = List.of(
-            new MinningSkillEffect()
+            new MiningSkillEffect()
     );
 
     @Override
     public SkillType getType() {
-        return SkillType.MINNING;
+        return SkillType.MINING;
     }
 
     @Override

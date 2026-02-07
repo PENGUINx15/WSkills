@@ -131,7 +131,7 @@ public class SkillMenu {
                 lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
                         .append(Component.text(formatPercent(Math.min(0.25, level * 0.025)), NamedTextColor.GOLD)));
             }
-            case MINNING -> {
+            case MINING -> {
                 double doubleDropChance = 0.05 * level;
                 lore.add(Component.text("Шанс двойного дропа: ", NamedTextColor.WHITE)
                         .append(Component.text(formatPercent(doubleDropChance), NamedTextColor.GOLD)));
@@ -153,7 +153,7 @@ public class SkillMenu {
     private String getDisplayName(SkillType type) {
         return switch (type) {
             case AGILITY -> "Ловкость";
-            case MINNING -> "Горное дело";
+            case MINING -> "Горное дело";
             case STRENGTH -> "Сила";
             case ENDURANCE -> "Выносливость";
         };

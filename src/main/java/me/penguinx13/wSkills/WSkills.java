@@ -9,8 +9,8 @@ import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
 import me.penguinx13.wSkills.skills.agility.AgilitySkill;
-import me.penguinx13.wSkills.skills.minning.MinningSkill;
-import me.penguinx13.wSkills.skills.minning.MinningXpListener;
+import me.penguinx13.wSkills.skills.mining.MiningSkill;
+import me.penguinx13.wSkills.skills.mining.MiningXpListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class WSkills extends JavaPlugin {
@@ -44,7 +44,7 @@ public class WSkills extends JavaPlugin {
 
     private void registerSkills() {
         skillManager.registerSkill(new AgilitySkill());
-        skillManager.registerSkill(new MinningSkill());
+        skillManager.registerSkill(new MiningSkill());
     }
 
     private void registerListeners() {
@@ -66,7 +66,7 @@ public class WSkills extends JavaPlugin {
         );
 
         pm.registerEvents(
-                new MinningXpListener(skillManager, skillApplier, skillStorage),
+                new MiningXpListener(skillManager, skillApplier, skillStorage),
                 this
         );
 
