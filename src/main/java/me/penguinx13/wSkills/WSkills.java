@@ -2,7 +2,6 @@ package me.penguinx13.wSkills;
 
 import me.penguinx13.wSkills.command.LevelCommand;
 import me.penguinx13.wSkills.skills.agility.AgilityXpListener;
-import me.penguinx13.wSkills.listener.DamageListener;
 import me.penguinx13.wSkills.listener.JoinQuitListener;
 import me.penguinx13.wSkills.listener.SkillMenuListener;
 import me.penguinx13.wSkills.service.SkillApplier;
@@ -12,6 +11,7 @@ import me.penguinx13.wSkills.skills.agility.AgilitySkill;
 import me.penguinx13.wSkills.skills.mining.MiningSkill;
 import me.penguinx13.wSkills.skills.mining.MiningSkillEffect;
 import me.penguinx13.wSkills.skills.mining.MiningXpListener;
+import me.penguinx13.wSkills.util.CoreProtectUtil;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class WSkills extends JavaPlugin {
@@ -23,8 +23,10 @@ public class WSkills extends JavaPlugin {
     @Override
     public void onEnable() {
         this.skillManager = new SkillManager();
-        this.skillApplier = new SkillApplier(skillManager);
+        this.skillApplier = new SkillApplier();
         this.skillStorage = new SkillStorage(getDataFolder());
+
+        CoreProtectUtil.init();
 
         registerSkills();
 
@@ -57,11 +59,6 @@ public class WSkills extends JavaPlugin {
         );
 
         pm.registerEvents(
-                new DamageListener(),
-                this
-        );
-
-        pm.registerEvents(
                 new AgilityXpListener(skillManager, skillApplier, skillStorage),
                 this
         );
@@ -89,17 +86,5 @@ public class WSkills extends JavaPlugin {
             command.setExecutor(levelCommand);
             command.setTabCompleter(levelCommand);
         }
-    }
-
-    public SkillManager getSkillManager() {
-        return skillManager;
-    }
-
-    public SkillApplier getSkillApplier() {
-        return skillApplier;
-    }
-
-    public SkillStorage getSkillStorage() {
-        return skillStorage;
     }
 }
