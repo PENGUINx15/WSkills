@@ -7,6 +7,5 @@ public class DamageListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent event) {
-        // Логика урона обрабатывается в SkillEffect'ах
     }
 }

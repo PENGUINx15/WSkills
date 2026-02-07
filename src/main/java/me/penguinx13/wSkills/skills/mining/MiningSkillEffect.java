@@ -1,57 +1,32 @@
 package me.penguinx13.wSkills.skills.mining;
 
+import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillEffect;
-import me.penguinx13.wSkills.API.SkillType;
-import me.penguinx13.wSkills.service.SkillManager;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.Random;
+public class MiningSkillEffect implements SkillEffect {
 
-public class MiningSkillEffect implements SkillEffect, Listener {
-
-    private final Random random = new Random();
-
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        int level = SkillManager.get().getLevel(player, SkillType.MINING);
-
-        if (level <= 0) return;
-
-        double doubleDropChance = 0.05 * level;
-        if (random.nextDouble() < doubleDropChance) {
-            ItemStack drop = new ItemStack(event.getBlock().getType());
-            event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
+    public static void apply(Player player, BlockBreakEvent event, int level) {
+        double chance = Math.min(1.0, 0.05 * level);
+        if (Math.random() < chance && event.isDropItems()) {
+            event.getBlock().getDrops(player.getInventory().getItemInMainHand())
+                    .forEach(drop -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop.clone()));
         }
 
-        int extraXp = 2 * level;
-        SkillManager.get().addXp(player, SkillType.MINING, extraXp);
+        player.giveExp(2 * level);
     }
 
-    @EventHandler
-    public void onItemDamage(PlayerItemDamageEvent event) {
-        Player player = event.getPlayer();
-        int level = SkillManager.get().getLevel(player, SkillType.MINING);
-        if (level <= 0) return;
-
-        double chance = 0.10 * level;
-        if (random.nextDouble() < chance) {
+    public static void apply(Player player, PlayerItemDamageEvent event, int level) {
+        double chance = Math.min(1.0, 0.10 * level);
+        if (Math.random() < chance) {
             event.setCancelled(true);
         }
     }
 
     @Override
     public void apply(Player player, int level) {
-
-    }
-
-    @Override
-    public void remove(Player player) {
 
     }
 }
