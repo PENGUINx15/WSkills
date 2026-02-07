@@ -1,4 +1,4 @@
-package me.penguinx13.wSkills.skills.minning;
+package me.penguinx13.wSkills.skills.mining;
 
 import me.penguinx13.wSkills.API.SkillType;
 import me.penguinx13.wSkills.service.SkillApplier;
@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class MinningXpListener implements Listener {
+public class MiningXpListener implements Listener {
 
     private static final int BREAK_XP = 5;
 
@@ -17,7 +17,7 @@ public class MinningXpListener implements Listener {
     private final SkillApplier applier;
     private final SkillStorage storage;
 
-    public MinningXpListener(SkillManager manager, SkillApplier applier, SkillStorage storage) {
+    public MiningXpListener(SkillManager manager, SkillApplier applier, SkillStorage storage) {
         this.manager = manager;
         this.applier = applier;
         this.storage = storage;
@@ -30,11 +30,11 @@ public class MinningXpListener implements Listener {
             return;
         }
 
-        int beforeLevel = manager.getLevel(player, SkillType.MINNING);
-        int afterLevel = manager.addXp(player, SkillType.MINNING, BREAK_XP);
+        int beforeLevel = manager.getLevel(player, SkillType.MINING);
+        int afterLevel = manager.addXp(player, SkillType.MINING, BREAK_XP);
 
         if (afterLevel > beforeLevel) {
-            applier.applySkill(player, SkillType.MINNING);
+            applier.applySkill(player, SkillType.MINING);
         }
 
         storage.save(player, manager);

@@ -1,4 +1,4 @@
-package me.penguinx13.wSkills.skills.minning;
+package me.penguinx13.wSkills.skills.mining;
 
 import me.penguinx13.wSkills.API.SkillEffect;
 import me.penguinx13.wSkills.API.SkillType;
@@ -12,14 +12,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-public class MinningSkillEffect implements SkillEffect, Listener {
+public class MiningSkillEffect implements SkillEffect, Listener {
 
     private final Random random = new Random();
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        int level = SkillManager.get().getLevel(player, SkillType.MINNING);
+        int level = SkillManager.get().getLevel(player, SkillType.MINING);
 
         if (level <= 0) return;
 
@@ -30,13 +30,13 @@ public class MinningSkillEffect implements SkillEffect, Listener {
         }
 
         int extraXp = 2 * level;
-        SkillManager.get().addXp(player, SkillType.MINNING, extraXp);
+        SkillManager.get().addXp(player, SkillType.MINING, extraXp);
     }
 
     @EventHandler
     public void onItemDamage(PlayerItemDamageEvent event) {
         Player player = event.getPlayer();
-        int level = SkillManager.get().getLevel(player, SkillType.MINNING);
+        int level = SkillManager.get().getLevel(player, SkillType.MINING);
         if (level <= 0) return;
 
         double chance = 0.10 * level;

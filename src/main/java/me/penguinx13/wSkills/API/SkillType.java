@@ -4,5 +4,5 @@ public enum SkillType {
     AGILITY,
     STRENGTH,
     ENDURANCE,
-    MINNING
+    MINING
 }
