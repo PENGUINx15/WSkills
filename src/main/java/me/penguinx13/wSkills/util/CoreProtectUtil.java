@@ -19,12 +19,19 @@ public final class CoreProtectUtil {
 
     public static boolean isPlayerPlaced(Block block) {
         if (api == null) return false;
-        List<String[]> lookup = api.blockLookup(block, 1);
-        for (String[] data : lookup) {
-            if ("block-place".equalsIgnoreCase(data[0])) {
-                return true;
-            }
+        List<String[]> lookup = api.blockLookup(block, 2);
+        if (lookup.isEmpty()) {
+            return false;
         }
-        return false;
+        if (isAction(lookup.get(0), "block-place")) {
+            return true;
+        }
+        return lookup.size() > 1
+                && isAction(lookup.get(0), "block-break")
+                && isAction(lookup.get(1), "block-place");
+    }
+
+    private static boolean isAction(String[] data, String action) {
+        return data.length > 0 && action.equalsIgnoreCase(data[0]);
     }
 }
