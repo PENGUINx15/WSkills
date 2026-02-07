@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SkillMenu {
 
-    public static final Component TITLE = Component.text("Навыки", NamedTextColor.DARK_GREEN);
+    public static final Component TITLE = Component.text("Навыки", NamedTextColor.BLACK);
 
     private static final int SKILL_SECTION_SIZE = 18;
     private static final int INVENTORY_SIZE = 54;
@@ -56,7 +56,7 @@ public class SkillMenu {
             int level = manager.getLevel(player, type);
             int xp = manager.getXp(player, type);
 
-            inventory.setItem(base, createHeader(type, skill, level, xp));
+            inventory.setItem(base+1, createHeader(type, skill, level, xp));
 
             int maxLevel = skill.getMaxLevel();
             for (int i = 1; i <= maxLevel; i++) {
@@ -64,7 +64,7 @@ public class SkillMenu {
                 if (slot >= INVENTORY_SIZE) {
                     break;
                 }
-                inventory.setItem(slot, createLevelItem(i, level, xp));
+                inventory.setItem(slot+1, createLevelItem(i, level, xp));
             }
         }
 
@@ -77,8 +77,6 @@ public class SkillMenu {
         meta.displayName(Component.text(getDisplayName(type), NamedTextColor.GOLD)
                 .style(Style.style(TextDecoration.BOLD)));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Уровень: ", NamedTextColor.WHITE)
-                .append(Component.text(level, NamedTextColor.GOLD)));
         lore.add(Component.text("Опыт: ", NamedTextColor.WHITE)
                 .append(Component.text(xp, NamedTextColor.GOLD)));
         lore.addAll(getBonusLore(type, skill, level));
@@ -91,13 +89,13 @@ public class SkillMenu {
         Material material = getLevelMaterial(levelNumber, currentLevel);
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text("Уровень " + levelNumber, NamedTextColor.YELLOW));
+        meta.displayName(Component.text("Уровень " + levelNumber, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
         List<Component> lore = new ArrayList<>();
         int requiredXp = 5000 * levelNumber;
-        lore.add(Component.text("Опыт: ", NamedTextColor.WHITE)
-                .append(Component.text(xp, NamedTextColor.YELLOW))
-                .append(Component.text("/", NamedTextColor.WHITE))
-                .append(Component.text(requiredXp, NamedTextColor.GOLD)));
+        lore.add(Component.text("Опыт: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+                .append(Component.text(xp, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
+                .append(Component.text("/", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false))
+                .append(Component.text(requiredXp, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
@@ -144,9 +142,9 @@ public class SkillMenu {
     private String getDisplayName(SkillType type) {
         return switch (type) {
             case AGILITY -> "Ловкость";
+            case MINNING -> "Горное дело";
             case STRENGTH -> "Сила";
             case ENDURANCE -> "Выносливость";
-            case MINNING -> "Майнинг";
         };
     }
 }
