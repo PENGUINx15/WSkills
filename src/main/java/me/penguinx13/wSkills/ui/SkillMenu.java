@@ -1,7 +1,7 @@
 package me.penguinx13.wSkills.ui;
 
 import me.penguinx13.wSkills.API.Skill;
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
 import me.penguinx13.wSkills.service.SkillManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -38,7 +38,7 @@ public class SkillMenu {
     private Inventory createInventory(Player player) {
         Inventory inventory = Bukkit.createInventory(null, INVENTORY_SIZE, TITLE);
 
-        List<SkillType> types = Arrays.stream(SkillType.values())
+        List<SkillID> types = Arrays.stream(SkillID.values())
                 .filter(type -> manager.getSkill(type) != null)
                 .toList();
 
@@ -47,7 +47,7 @@ public class SkillMenu {
             if (base >= INVENTORY_SIZE) {
                 break;
             }
-            SkillType type = types.get(index);
+            SkillID type = types.get(index);
             Skill skill = manager.getSkill(type);
             if (skill == null) {
                 continue;
@@ -71,7 +71,7 @@ public class SkillMenu {
         return inventory;
     }
 
-    private ItemStack createHeader(SkillType type, Skill skill, int level, int xp) {
+    private ItemStack createHeader(SkillID type, Skill skill, int level, int xp) {
         ItemStack item = new ItemStack(Material.BOOK);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text(getDisplayName(type), NamedTextColor.GOLD)
@@ -122,7 +122,7 @@ public class SkillMenu {
         return String.format("%.1f%%", percent);
     }
 
-    private List<Component> getBonusLore(SkillType type, Skill skill, int level) {
+    private List<Component> getBonusLore(SkillID type, Skill skill, int level) {
         List<Component> lore = new ArrayList<>();
         switch (type) {
             case AGILITY -> {
@@ -150,7 +150,7 @@ public class SkillMenu {
         return lore;
     }
 
-    private String getDisplayName(SkillType type) {
+    private String getDisplayName(SkillID type) {
         return switch (type) {
             case AGILITY -> "Ловкость";
             case MINING -> "Горное дело";

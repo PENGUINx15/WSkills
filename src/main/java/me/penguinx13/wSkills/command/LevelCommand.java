@@ -1,6 +1,6 @@
 package me.penguinx13.wSkills.command;
 
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
 import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
@@ -80,7 +80,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        SkillType type = parseSkillType(args[3]);
+        SkillID type = parseSkillType(args[3]);
         if (type == null) {
             sender.sendMessage(NamedTextColor.RED + "Unknown skill type.");
             return true;
@@ -159,7 +159,7 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 4) {
             List<String> skills = new ArrayList<>();
-            for (SkillType type : SkillType.values()) {
+            for (SkillID type : SkillID.values()) {
                 skills.add(type.name().toLowerCase(Locale.ROOT));
             }
             return filterPrefix(skills, args[3]);
@@ -175,9 +175,9 @@ public class LevelCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(NamedTextColor.YELLOW + "/" + label + " level add <player> <skill> <amount>");
     }
 
-    private SkillType parseSkillType(String input) {
+    private SkillID parseSkillType(String input) {
         try {
-            return SkillType.valueOf(input.toUpperCase(Locale.ROOT));
+            return SkillID.valueOf(input.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             return null;
         }

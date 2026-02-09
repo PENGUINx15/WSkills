@@ -2,29 +2,32 @@ package me.penguinx13.wSkills.skills.mining;
 
 import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillEffect;
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
+import me.penguinx13.wSkills.skills.mining.effects.DoubleDrop;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class MiningSkill implements Skill {
 
-    private final List<SkillEffect> effects = List.of(
-            new MiningSkillEffect()
-    );
+    private final Map<MiningEffectID, SkillEffect<MiningEffectID>> effects = new EnumMap<>(MiningEffectID.class);
 
+    public MiningSkill() {
+        effects.put(MiningEffectID.DOUBLE_DROP, new DoubleDrop());
+    }
+
+    public SkillEffect<MiningEffectID> getEffect(MiningEffectID id) {
+        return effects.get(id);
+    }
     @Override
-    public SkillType getType() {
-        return SkillType.MINING;
+    public SkillID getType() {
+        return SkillID.MINING;
     }
 
     @Override
     public int getMaxLevel() {
         return 5;
-    }
-
-    @Override
-    public double getValuePerLevel() {
-        return 0.15;
     }
 
     @Override

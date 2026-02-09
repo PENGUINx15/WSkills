@@ -1,10 +1,25 @@
 package me.penguinx13.wSkills.API;
 
-import org.bukkit.entity.Player;
+import me.penguinx13.wSkills.service.SkillContext;
 
-public interface SkillEffect {
+public abstract class SkillEffect<E extends Enum<E>> {
+    private final E id;
+    private final double valuePerLevel;
+    private final double maxValue;
 
-    void apply(Player player, int level);
+    protected SkillEffect(E id, double valuePerLevel, double maxValue) {
+        this.id = id;
+        this.valuePerLevel = valuePerLevel;
+        this.maxValue = maxValue;
+    }
 
-    default void remove(Player player) {}
+    public E getId() {
+        return id;
+    }
+
+    public double getChance(int level) {
+        return Math.min(level * valuePerLevel, maxValue);
+    }
+
+    public abstract void apply(SkillContext context);
 }

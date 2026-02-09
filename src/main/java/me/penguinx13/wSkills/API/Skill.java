@@ -4,11 +4,9 @@ import java.util.List;
 
 public interface Skill {
 
-    SkillType getType();
+    SkillID getType();
 
     int getMaxLevel();
-
-    double getValuePerLevel();
 
     List<SkillEffect> getEffects();
 }

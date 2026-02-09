@@ -1,6 +1,6 @@
 package me.penguinx13.wSkills.skills.agility;
 
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
 import me.penguinx13.wSkills.service.SkillApplier;
 import me.penguinx13.wSkills.service.SkillManager;
 import me.penguinx13.wSkills.service.SkillStorage;
@@ -59,13 +59,13 @@ public class AgilityXpListener implements Listener {
     }
 
     private boolean awardXp(Player player, int xp) {
-        int beforeLevel = manager.getLevel(player, SkillType.AGILITY);
-        int afterLevel = manager.addXp(player, SkillType.AGILITY, xp);
+        int beforeLevel = manager.getLevel(player, SkillID.AGILITY);
+        int afterLevel = manager.addXp(player, SkillID.AGILITY, xp);
         if (xp <= 0) {
             return false;
         }
         if (afterLevel > beforeLevel) {
-            applier.applySkill(player, SkillType.AGILITY);
+            applier.applySkill(player, SkillID.AGILITY);
         }
         return true;
     }

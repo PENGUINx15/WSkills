@@ -1,8 +1,6 @@
 package me.penguinx13.wSkills.API;
 
-public enum SkillType {
+public enum SkillID {
     AGILITY,
-    STRENGTH,
-    ENDURANCE,
     MINING
 }

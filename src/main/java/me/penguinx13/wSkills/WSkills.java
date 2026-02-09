@@ -69,11 +69,6 @@ public class WSkills extends JavaPlugin {
         );
 
         pm.registerEvents(
-                new MiningSkillEffect(),
-                this
-        );
-
-        pm.registerEvents(
                 new SkillMenuListener(),
                 this
         );

@@ -2,8 +2,7 @@ package me.penguinx13.wSkills.service;
 
 import me.penguinx13.wSkills.API.PlayerSkills;
 import me.penguinx13.wSkills.API.Skill;
-import me.penguinx13.wSkills.API.SkillType;
-import org.bukkit.entity.Player;
+import me.penguinx13.wSkills.API.SkillID;
 
 public class SkillApplier {
     private static SkillApplier instance;
@@ -11,23 +10,22 @@ public class SkillApplier {
     public SkillApplier() {
         instance = this;
     }
-    public void applyAll(Player player) {
-        PlayerSkills ps = SkillManager.get().getPlayerSkills(player);
+    public void applyAll(SkillContext context) {
+        PlayerSkills ps = SkillManager.get().getPlayerSkills(context.getPlayer());
         if (ps == null) return;
 
         for (Skill skill : SkillManager.get().getAllSkills()) {
-            int level = ps.getLevel(skill.getType());
-            skill.getEffects().forEach(effect -> effect.apply(player, level));
+            skill.getEffects().forEach(effect -> effect.apply(context));
         }
     }
 
-    public void applySkill(Player player, SkillType type) {
+    public void applySkill(SkillID type, SkillContext context) {
         Skill skill = SkillManager.get().getSkill(type);
         if (skill == null) return;
 
-        int level = SkillManager.get().getLevel(player, type);
-        skill.getEffects().forEach(effect -> effect.apply(player, level));
+        skill.getEffects().forEach(effect -> effect.apply(context));
     }
+
     public static SkillApplier get() {
         return instance;
     }

@@ -5,22 +5,22 @@ import java.util.Map;
 
 public class PlayerSkills {
 
-    private final Map<SkillType, Integer> skills = new EnumMap<>(SkillType.class);
-    private final Map<SkillType, Integer> skillXp = new EnumMap<>(SkillType.class);
+    private final Map<SkillID, Integer> skills = new EnumMap<>(SkillID.class);
+    private final Map<SkillID, Integer> skillXp = new EnumMap<>(SkillID.class);
 
-    public int getLevel(SkillType type) {
+    public int getLevel(SkillID type) {
         return skills.getOrDefault(type, 0);
     }
 
-    public void setLevel(SkillType type, int level) {
+    public void setLevel(SkillID type, int level) {
         skills.put(type, level);
     }
 
-    public int getXp(SkillType type) {
+    public int getXp(SkillID type) {
         return skillXp.getOrDefault(type, 0);
     }
 
-    public void setXp(SkillType type, int xp) {
+    public void setXp(SkillID type, int xp) {
         skillXp.put(type, xp);
     }
 }

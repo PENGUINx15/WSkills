@@ -2,7 +2,9 @@ package me.penguinx13.wSkills.skills.agility;
 
 import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillEffect;
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
+import me.penguinx13.wSkills.skills.agility.effects.AgilityDodgeEffect;
+import me.penguinx13.wSkills.skills.agility.effects.AgilitySpeedEffect;
 
 import java.util.List;
 
@@ -14,8 +16,8 @@ public class AgilitySkill implements Skill {
     );
 
     @Override
-    public SkillType getType() {
-        return SkillType.AGILITY;
+    public SkillID getType() {
+        return SkillID.AGILITY;
     }
 
     @Override

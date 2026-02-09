@@ -1,10 +1,9 @@
 package me.penguinx13.wSkills.service;
 
-import me.penguinx13.wSkills.API.SkillType;
+import me.penguinx13.wSkills.API.SkillID;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -68,7 +67,7 @@ public class SkillStorage {
     public void load(Player player, SkillManager manager) {
         manager.registerPlayer(player);
 
-        Map<SkillType, Integer> levels = new EnumMap<>(SkillType.class);
+        Map<SkillID, Integer> levels = new EnumMap<>(SkillID.class);
         String sql = "SELECT skill, level, xp FROM player_skills WHERE player_uuid = ?";
 
         try (Connection connection = DriverManager.getConnection(databaseUrl);
@@ -80,7 +79,7 @@ public class SkillStorage {
                     int level = resultSet.getInt("level");
                     int xp = resultSet.getInt("xp");
                     try {
-                        SkillType type = SkillType.valueOf(skillName);
+                        SkillID type = SkillID.valueOf(skillName);
                         levels.put(type, level);
                         manager.setXp(player, type, xp);
                     } catch (IllegalArgumentException ignored) {
@@ -91,7 +90,7 @@ public class SkillStorage {
             e.printStackTrace();
         }
 
-        for (SkillType type : SkillType.values()) {
+        for (SkillID type : SkillID.values()) {
             int level = levels.getOrDefault(type, 0);
             manager.setLevel(player, type, level);
         }
@@ -103,7 +102,7 @@ public class SkillStorage {
 
         try (Connection connection = DriverManager.getConnection(databaseUrl);
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            for (SkillType type : SkillType.values()) {
+            for (SkillID type : SkillID.values()) {
                 statement.setString(1, player.getUniqueId().toString());
                 statement.setString(2, type.name());
                 statement.setInt(3, manager.getLevel(player, type));
