@@ -69,10 +69,11 @@ public class SkillStorage {
 
         Map<SkillID, Integer> levels = new EnumMap<>(SkillID.class);
         String sql = "SELECT skill, level, xp FROM player_skills WHERE player_uuid = ?";
+        String uuid = player.getUniqueId().toString();
 
         try (Connection connection = DriverManager.getConnection(databaseUrl);
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, player.getUniqueId().toString());
+            statement.setString(1, uuid);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     String skillName = resultSet.getString("skill");
@@ -100,16 +101,21 @@ public class SkillStorage {
         String sql = "INSERT INTO player_skills (player_uuid, skill, level, xp) VALUES (?, ?, ?, ?) " +
                 "ON CONFLICT(player_uuid, skill) DO UPDATE SET level = excluded.level, xp = excluded.xp";
 
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            for (SkillID type : SkillID.values()) {
-                statement.setString(1, player.getUniqueId().toString());
-                statement.setString(2, type.name());
-                statement.setInt(3, manager.getLevel(player, type));
-                statement.setInt(4, manager.getXp(player, type));
-                statement.addBatch();
+        String uuid = player.getUniqueId().toString();
+
+        try (Connection connection = DriverManager.getConnection(databaseUrl)) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (SkillID type : SkillID.values()) {
+                    statement.setString(1, uuid);
+                    statement.setString(2, type.name());
+                    statement.setInt(3, manager.getLevel(player, type));
+                    statement.setInt(4, manager.getXp(player, type));
+                    statement.addBatch();
+                }
+                statement.executeBatch();
             }
-            statement.executeBatch();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }

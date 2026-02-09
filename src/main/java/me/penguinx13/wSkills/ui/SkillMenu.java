@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class SkillMenu {
 
@@ -41,20 +42,18 @@ public class SkillMenu {
     private Inventory createInventory(Player player) {
         Inventory inventory = Bukkit.createInventory(null, INVENTORY_SIZE, TITLE);
 
-        List<SkillID> types = Arrays.stream(SkillID.values())
-                .filter(type -> manager.getSkill(type) != null)
+        List<Skill> skills = Arrays.stream(SkillID.values())
+                .map(manager::getSkill)
+                .filter(Objects::nonNull)
                 .toList();
 
-        for (int index = 0; index < types.size(); index++) {
+        for (int index = 0; index < skills.size(); index++) {
             int base = index * SKILL_SECTION_SIZE;
             if (base >= INVENTORY_SIZE) {
                 break;
             }
-            SkillID type = types.get(index);
-            Skill skill = manager.getSkill(type);
-            if (skill == null) {
-                continue;
-            }
+            Skill skill = skills.get(index);
+            SkillID type = skill.getType();
 
             int level = manager.getLevel(player, type);
             int xp = manager.getXp(player, type);
