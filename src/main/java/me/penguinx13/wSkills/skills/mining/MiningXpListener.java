@@ -37,6 +37,6 @@ public class MiningXpListener implements Listener {
             SkillApplier.get().applySkill(player, SkillID.MINING);
         }
 
-        storage.save(player, SkillManager.get());
+        storage.markDirty(player);
     }
 }

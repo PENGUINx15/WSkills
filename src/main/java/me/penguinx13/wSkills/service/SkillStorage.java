@@ -10,12 +10,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SkillStorage {
 
     private final String databaseUrl;
+    private final Set<UUID> dirtyPlayers = ConcurrentHashMap.newKeySet();
 
     public SkillStorage(File dataFolder) {
         if (!dataFolder.exists() && !dataFolder.mkdirs()) {
@@ -118,6 +124,21 @@ public class SkillStorage {
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            dirtyPlayers.remove(player.getUniqueId());
         }
+    }
+
+    public void markDirty(Player player) {
+        dirtyPlayers.add(player.getUniqueId());
+    }
+
+    public Set<UUID> drainDirtyPlayers() {
+        if (dirtyPlayers.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<UUID> snapshot = new HashSet<>(dirtyPlayers);
+        dirtyPlayers.removeAll(snapshot);
+        return snapshot;
     }
 }

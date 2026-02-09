@@ -54,7 +54,7 @@ public class AgilityXpListener implements Listener {
         }
 
         if (awarded) {
-            storage.save(player, manager);
+            storage.markDirty(player);
         }
     }
 
