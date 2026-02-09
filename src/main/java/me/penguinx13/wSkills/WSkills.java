@@ -13,7 +13,11 @@ import me.penguinx13.wSkills.skills.agility.AgilityXpListener;
 import me.penguinx13.wSkills.skills.mining.MiningSkill;
 import me.penguinx13.wSkills.skills.mining.MiningXpListener;
 import me.penguinx13.wSkills.util.CoreProtectUtil;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class WSkills extends JavaPlugin {
 
@@ -33,6 +37,7 @@ public class WSkills extends JavaPlugin {
 
         registerListeners();
         registerCommands();
+        scheduleAutoSave();
 
         getLogger().info("WSkills enabled");
     }
@@ -92,5 +97,21 @@ public class WSkills extends JavaPlugin {
             command.setExecutor(levelCommand);
             command.setTabCompleter(levelCommand);
         }
+    }
+
+    private void scheduleAutoSave() {
+        long intervalTicks = 20L * 30L;
+        getServer().getScheduler().runTaskTimer(this, () -> {
+            Set<UUID> dirtyPlayers = skillStorage.drainDirtyPlayers();
+            if (dirtyPlayers.isEmpty()) {
+                return;
+            }
+            for (UUID uuid : dirtyPlayers) {
+                Player player = getServer().getPlayer(uuid);
+                if (player != null && player.isOnline()) {
+                    skillStorage.save(player, skillManager);
+                }
+            }
+        }, intervalTicks, intervalTicks);
     }
 }
