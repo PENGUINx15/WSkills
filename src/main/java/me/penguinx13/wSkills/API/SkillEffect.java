@@ -17,8 +17,12 @@ public abstract class SkillEffect<E extends Enum<E>> {
         return id;
     }
 
-    public double getChance(int level) {
+    public double getValue(int level) {
         return Math.min(level * valuePerLevel, maxValue);
+    }
+
+    public double getChance(int level) {
+        return getValue(level);
     }
 
     public abstract void apply(SkillContext context);

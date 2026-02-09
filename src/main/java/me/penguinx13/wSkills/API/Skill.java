@@ -1,6 +1,6 @@
 package me.penguinx13.wSkills.API;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface Skill {
 
@@ -8,5 +8,5 @@ public interface Skill {
 
     int getMaxLevel();
 
-    List<SkillEffect> getEffects();
+    Collection<? extends SkillEffect<?>> getEffects();
 }

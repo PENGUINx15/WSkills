@@ -7,7 +7,7 @@ import me.penguinx13.wSkills.util.ChanceUtil;
 import me.penguinx13.wSkills.util.CoreProtectUtil;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class DoubleDrop extends SkillEffect {
+public class DoubleDrop extends SkillEffect<MiningEffectID> {
 
     public DoubleDrop() {
         super(MiningEffectID.DOUBLE_DROP, 0.05, 1.0);
@@ -32,4 +32,3 @@ public class DoubleDrop extends SkillEffect {
         );
     }
 }
-

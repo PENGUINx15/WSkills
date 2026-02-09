@@ -2,7 +2,10 @@ package me.penguinx13.wSkills.ui;
 
 import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillID;
+import me.penguinx13.wSkills.API.SkillEffect;
 import me.penguinx13.wSkills.service.SkillManager;
+import me.penguinx13.wSkills.skills.agility.AgilityEffectID;
+import me.penguinx13.wSkills.skills.mining.MiningEffectID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -126,28 +129,50 @@ public class SkillMenu {
         List<Component> lore = new ArrayList<>();
         switch (type) {
             case AGILITY -> {
-                lore.add(Component.text("Бонус скорости: ", NamedTextColor.WHITE)
-                        .append(Component.text(formatPercent(skill.getValuePerLevel() * level), NamedTextColor.GOLD)));
-                lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
-                        .append(Component.text(formatPercent(Math.min(0.25, level * 0.025)), NamedTextColor.GOLD)));
+                SkillEffect<?> speedEffect = findEffect(skill, AgilityEffectID.SPEED);
+                SkillEffect<?> dodgeEffect = findEffect(skill, AgilityEffectID.DODGE);
+                if (speedEffect != null) {
+                    lore.add(Component.text("Бонус скорости: ", NamedTextColor.WHITE)
+                            .append(Component.text(formatPercent(speedEffect.getValue(level)), NamedTextColor.GOLD)));
+                }
+                if (dodgeEffect != null) {
+                    lore.add(Component.text("Бонус уклонения: ", NamedTextColor.WHITE)
+                            .append(Component.text(formatPercent(dodgeEffect.getValue(level)), NamedTextColor.GOLD)));
+                }
             }
             case MINING -> {
-                double doubleDropChance = 0.05 * level;
-                lore.add(Component.text("Шанс двойного дропа: ", NamedTextColor.WHITE)
-                        .append(Component.text(formatPercent(doubleDropChance), NamedTextColor.GOLD)));
+                SkillEffect<?> doubleDrop = findEffect(skill, MiningEffectID.DOUBLE_DROP);
+                if (doubleDrop != null) {
+                    lore.add(Component.text("Шанс двойного дропа: ", NamedTextColor.WHITE)
+                            .append(Component.text(formatPercent(doubleDrop.getValue(level)), NamedTextColor.GOLD)));
+                }
 
-                double durabilityBonus = 0.10 * level;
-                lore.add(Component.text("Снижение износа инструмента: ", NamedTextColor.WHITE)
-                        .append(Component.text(formatPercent(durabilityBonus), NamedTextColor.GOLD)));
+                SkillEffect<?> durabilitySave = findEffect(skill, MiningEffectID.DURABILITY_SAVE);
+                if (durabilitySave != null) {
+                    lore.add(Component.text("Снижение износа инструмента: ", NamedTextColor.WHITE)
+                            .append(Component.text(formatPercent(durabilitySave.getValue(level)), NamedTextColor.GOLD)));
+                }
 
-                int extraXp = 2 * level;
-                lore.add(Component.text("Доп. опыт за добычу: ", NamedTextColor.WHITE)
-                        .append(Component.text(String.valueOf(extraXp), NamedTextColor.GOLD)));
+                SkillEffect<?> extraXp = findEffect(skill, MiningEffectID.EXTRA_XP);
+                if (extraXp != null) {
+                    int bonusXp = (int) Math.round(extraXp.getValue(level));
+                    lore.add(Component.text("Доп. опыт за добычу: ", NamedTextColor.WHITE)
+                            .append(Component.text(String.valueOf(bonusXp), NamedTextColor.GOLD)));
+                }
             }
             default -> {
             }
         }
         return lore;
+    }
+
+    private SkillEffect<?> findEffect(Skill skill, Enum<?> id) {
+        for (SkillEffect<?> effect : skill.getEffects()) {
+            if (effect.getId().equals(id)) {
+                return effect;
+            }
+        }
+        return null;
     }
 
     private String getDisplayName(SkillID type) {
