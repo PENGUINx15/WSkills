@@ -5,11 +5,11 @@ import me.penguinx13.wSkills.service.SkillContext;
 import me.penguinx13.wSkills.skills.agility.AgilityEffectID;
 import org.bukkit.attribute.Attribute;
 
-public class AgilitySpeedEffect extends SkillEffect<AgilityEffectID> {
+public class Speed extends SkillEffect<AgilityEffectID> {
 
     private static final double BASE_SPEED = 0.1;
 
-    public AgilitySpeedEffect() {
+    public Speed() {
         super(AgilityEffectID.SPEED, 0.1, 0.5);
     }
 

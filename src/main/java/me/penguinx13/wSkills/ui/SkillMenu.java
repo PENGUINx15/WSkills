@@ -178,8 +178,6 @@ public class SkillMenu {
         return switch (type) {
             case AGILITY -> "Ловкость";
             case MINING -> "Горное дело";
-            case STRENGTH -> "Сила";
-            case ENDURANCE -> "Выносливость";
         };
     }
 }

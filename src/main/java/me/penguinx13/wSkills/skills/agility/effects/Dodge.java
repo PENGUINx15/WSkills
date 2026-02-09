@@ -7,9 +7,9 @@ import me.penguinx13.wSkills.util.ChanceUtil;
 import org.bukkit.Particle;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class AgilityDodgeEffect extends SkillEffect<AgilityEffectID> {
+public class Dodge extends SkillEffect<AgilityEffectID> {
 
-    public AgilityDodgeEffect() {
+    public Dodge() {
         super(AgilityEffectID.DODGE, 0.025, 0.25);
     }
 

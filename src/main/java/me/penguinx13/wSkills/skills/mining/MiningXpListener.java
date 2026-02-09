@@ -10,13 +10,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class XpListener implements Listener {
+public class MiningXpListener implements Listener {
 
     private static final int BREAK_XP = 5;
 
     private final SkillStorage storage;
 
-    public XpListener(SkillStorage storage) {
+    public MiningXpListener(SkillStorage storage) {
         this.storage = storage;
     }
 
