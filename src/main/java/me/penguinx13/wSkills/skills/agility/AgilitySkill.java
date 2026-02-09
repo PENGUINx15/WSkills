@@ -6,14 +6,22 @@ import me.penguinx13.wSkills.API.SkillID;
 import me.penguinx13.wSkills.skills.agility.effects.AgilityDodgeEffect;
 import me.penguinx13.wSkills.skills.agility.effects.AgilitySpeedEffect;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class AgilitySkill implements Skill {
 
-    private final List<SkillEffect> effects = List.of(
-            new AgilitySpeedEffect(),
-            new AgilityDodgeEffect()
-    );
+    private final Map<AgilityEffectID, SkillEffect<AgilityEffectID>> effects = new EnumMap<>(AgilityEffectID.class);
+
+    public AgilitySkill() {
+        effects.put(AgilityEffectID.SPEED, new AgilitySpeedEffect());
+        effects.put(AgilityEffectID.DODGE, new AgilityDodgeEffect());
+    }
+
+    public SkillEffect<AgilityEffectID> getEffect(AgilityEffectID id) {
+        return effects.get(id);
+    }
 
     @Override
     public SkillID getType() {
@@ -26,12 +34,7 @@ public class AgilitySkill implements Skill {
     }
 
     @Override
-    public double getValuePerLevel() {
-        return 0.1;
-    }
-
-    @Override
-    public List<SkillEffect> getEffects() {
-        return effects;
+    public Collection<? extends SkillEffect<?>> getEffects() {
+        return effects.values();
     }
 }

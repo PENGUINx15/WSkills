@@ -27,11 +27,14 @@ public class XpListener implements Listener {
             return;
         }
 
+        int level = SkillManager.get().getLevel(player, SkillID.MINING);
+        SkillApplier.get().applySkill(SkillID.MINING, new SkillContext(player, level, event));
+
         int beforeLevel = SkillManager.get().getLevel(player, SkillID.MINING);
         int afterLevel = SkillManager.get().addXp(player, SkillID.MINING, BREAK_XP);
 
         if (afterLevel > beforeLevel) {
-            SkillApplier.get().applySkill(SkillID.MINING, new SkillContext(player, player.getLevel(), event));
+            SkillApplier.get().applySkill(player, SkillID.MINING);
         }
 
         storage.save(player, SkillManager.get());

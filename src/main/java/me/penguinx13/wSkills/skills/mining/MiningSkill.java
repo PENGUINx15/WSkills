@@ -4,9 +4,11 @@ import me.penguinx13.wSkills.API.Skill;
 import me.penguinx13.wSkills.API.SkillEffect;
 import me.penguinx13.wSkills.API.SkillID;
 import me.penguinx13.wSkills.skills.mining.effects.DoubleDrop;
+import me.penguinx13.wSkills.skills.mining.effects.DurabilitySave;
+import me.penguinx13.wSkills.skills.mining.effects.ExtraXp;
 
+import java.util.Collection;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 public class MiningSkill implements Skill {
@@ -15,6 +17,8 @@ public class MiningSkill implements Skill {
 
     public MiningSkill() {
         effects.put(MiningEffectID.DOUBLE_DROP, new DoubleDrop());
+        effects.put(MiningEffectID.DURABILITY_SAVE, new DurabilitySave());
+        effects.put(MiningEffectID.EXTRA_XP, new ExtraXp());
     }
 
     public SkillEffect<MiningEffectID> getEffect(MiningEffectID id) {
@@ -31,7 +35,7 @@ public class MiningSkill implements Skill {
     }
 
     @Override
-    public List<SkillEffect> getEffects() {
-        return effects;
+    public Collection<? extends SkillEffect<?>> getEffects() {
+        return effects.values();
     }
 }
